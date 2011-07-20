@@ -29,4 +29,4 @@ Installation
         https://google.com/movies
         https://www.google.com/movies
 
-4. Popcorn will ask you to log in to your Hunch account if you haven't already. Then you'll see ratings load next to each title. The ratings are color-coded, with better ratings appearing bolder. If you're interested, you can click a rating to open Hunch's page for that film.
+4. Popcorn will ask you to log in to your Hunch account if you haven't already. (Note that credentials are sent in the clear, since the script uses basic auth to log in.) Then you'll see ratings load next to each title. The ratings are color-coded, with better ratings appearing bolder. If you're interested, you can click a rating to open Hunch's page for that film.
