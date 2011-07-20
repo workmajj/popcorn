@@ -15,8 +15,8 @@ Description
 
 Popcorn is a [userscript](http://wiki.greasespot.net/User_script) that runs as a native Chrome extension, or in Firefox under [Greasemonkey](http://www.greasespot.net/). Popcorn adds Hunch recommendations to Google's [Movie Showtimes](http://www.google.com/movies) pages by appending a score next to each title, which is Hunch's prediction of how much you'll like the film.
 
-Installation
-------------
+Installation & Usage
+--------------------
 
 1. You'll need to [sign up](http://hunch.com/people/create-account/) for a Hunch account in order to use Popcorn. (The more you use Hunch, the more accurate the recs will be.)
 
@@ -29,4 +29,8 @@ Installation
         https://google.com/movies
         https://www.google.com/movies
 
-4. Popcorn will ask you to log in to your Hunch account if you haven't already. (Note that credentials are sent in the clear, since the script uses basic auth to log in.) Then you'll see ratings load next to each title. The ratings are color-coded, with better ratings appearing bolder. If you're interested, you can click a rating to open Hunch's page for that film.
+4. Popcorn will ask you to log in to your Hunch account if you haven't already. (Note that credentials are sent in the clear using basic auth.)
+
+5. Now you'll see ratings load next to each title. The ratings are color-coded, with better ratings appearing bolder.
+
+6. If you're interested, you can click a rating to open Hunch's page for that film in a new window/tab.
