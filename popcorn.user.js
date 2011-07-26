@@ -34,8 +34,6 @@ function launch(callback, data) {
         i++;
     }
     
-    console.log("applyScript=" + applyScript)
-    
     if (applyScript) {
         var script = document.createElement('script');
         script.setAttribute('src',
