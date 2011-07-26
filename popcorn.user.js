@@ -46,6 +46,7 @@ function launch(callback, data) {
         }, false);
         document.body.appendChild(script);
     }
+    
 }
 
 function main(site) {
