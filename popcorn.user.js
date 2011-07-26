@@ -1,21 +1,54 @@
-// Chrome uses the @match header; Firefox uses @include. Chrome will process
-// @include, but incorrectly warn about the script accessing too wide a scope.
-// Setting the headers up as below solves this and satisfies both browsers.
-
 // ==UserScript==
 // @name Popcorn
 // @namespace https://github.com/workmajj/popcorn
 // @description Adds Hunch recommendations to product pages.
-// @match http://google.com/movies*
-// @match http://www.google.com/movies*
-// @match https://google.com/movies*
-// @match https://www.google.com/movies*
-// @include http://google.com/movies*
-// @include http://www.google.com/movies*
-// @include https://google.com/movies*
-// @include https://www.google.com/movies*
 // @version 0.2
 // ==/UserScript==
+
+// Describes where to find data on a particular site's product pages.
+
+var site = {
+    "urls": ["http://google.com/movies", "http://www.google.com/movies"],
+    "path": "div.movie",
+    "id_path": ["span.info", "a.fl"],
+    "id_prefix": "imdb_",
+    "link_match": "IMDb",
+    "link_regex": "http:\\/\\/www.imdb.com\\/title\\/(tt\\d+)\\/",
+    "rec_path": ["div.name"]
+};
+
+launch(main, site);
+
+// Chrome doesn't support the @require header, so add jQuery manually:
+// http://erikvold.com/blog/index.cfm/2010/6/14/using-jquery-with-a-user-script
+
+function launch(callback, data) {
+    
+    // Check if the script applies to a given page based on the URL.
+    
+    var applyScript = false;
+    var i = 0;
+    while (applyScript === false) {
+        if (i >= site.urls.length) { break; }
+        if (location.href.indexOf(site.urls[i]) === 0) { applyScript = true; }
+        i++;
+    }
+    
+    console.log("applyScript=" + applyScript)
+    
+    if (applyScript) {
+        var script = document.createElement('script');
+        script.setAttribute('src',
+            'http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js');
+        script.addEventListener('load', function() {
+            var script = document.createElement('script');
+            script.textContent = '(' + callback.toString() + ')('
+                + JSON.stringify(data) + ');';
+            document.body.appendChild(script);
+        }, false);
+        document.body.appendChild(script);
+    }
+}
 
 function main(site) {
     
@@ -68,49 +101,34 @@ function main(site) {
         return path;
     }
     
-    // Check if the script applies to a given page based on the URLs above.
-    // This will be more useful when a modular version of the script is ready.
+    // Create a set of IMDB IDs by iterating through all div.movie elements
+    // and capturing IDs where present. At the same time, append a div to 
+    // any movie with an ID, which will be used to display the Hunch score.
     
-    var applyScript = false;
-    var i = 0;
-    while (applyScript === false) {
-        if (i >= site.urls.length) { break; }
-        if (location.href.indexOf(site.urls[i]) === 0) { applyScript = true; }
-        i++;
-    }
+    var itemIds = {};
     
-    if (applyScript) {
-        
-        // Create a set of IMDB IDs by iterating through all div.movie elements
-        // and capturing IDs where present. At the same time, append a div to 
-        // any movie with an ID, which will be used to display the Hunch score.
-        
-        var itemIds = {};
-        
-        $(site.path).each(function() {
-            var id = false;
-            var idPath = buildPath($(this), site.id_path);
-            idPath.filter(function() {
-                return this.innerHTML.match(site.link_match);
-            }).each(function() {
-                id = this.href.match(site.link_regex)[1];
-            });
-            if (id) {
-                itemIds[id] = true;
-                var recPath = buildPath($(this), site.rec_path);
-                var div = '<div class="popcorn-' + id + '"></div>';
-                recPath.append(div);
-                var img = '<img src="data:image/gif;base64,' + loadingImage
-                    + '" style="float:right" />';
-                recPath.children('div.popcorn-' + id).append(img);
-            }
+    $(site.path).each(function() {
+        var id = false;
+        var idPath = buildPath($(this), site.id_path);
+        idPath.filter(function() {
+            return this.innerHTML.match(site.link_match);
+        }).each(function() {
+            id = this.href.match(site.link_regex)[1];
         });
-        
-        // Hunch API automatically calls hnAsyncInit once loaded.
-        
-        $.getScript('http://hunch.com/media/js/hunch-api.js');
-        
-    }
+        if (id) {
+            itemIds[id] = true;
+            var recPath = buildPath($(this), site.rec_path);
+            var div = '<div class="popcorn-' + id + '"></div>';
+            recPath.append(div);
+            var img = '<img src="data:image/gif;base64,' + loadingImage
+                + '" style="float:right" />';
+            recPath.children('div.popcorn-' + id).append(img);
+        }
+    });
+    
+    // Hunch API automatically calls hnAsyncInit once loaded.
+    
+    $.getScript('http://hunch.com/media/js/hunch-api.js');
     
     // General idea is to use IMDB IDs as aliases to fetch whichever IDs (IMDB,
     // Hunch, Freebase, etc.) Hunch uses internally. These vary depending on
@@ -172,33 +190,3 @@ function main(site) {
     }
     
 }
-
-// Describes where to find data on the Movie Showtimes pages.
-
-var site = {
-    "urls": ["http://google.com/movies", "http://www.google.com/movies"],
-    "path": "div.movie",
-    "id_path": ["span.info", "a.fl"],
-    "id_prefix": "imdb_",
-    "link_match": "IMDb",
-    "link_regex": "http:\\/\\/www.imdb.com\\/title\\/(tt\\d+)\\/",
-    "rec_path": ["div.name"]
-};
-
-// Chrome doesn't support the @require header yet, so add jQuery manually:
-// http://erikvold.com/blog/index.cfm/2010/6/14/using-jquery-with-a-user-script
-
-function addJQuery(callback) {
-    var script = document.createElement('script');
-    script.setAttribute('src',
-        'http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js');
-    script.addEventListener('load', function() {
-        var script = document.createElement('script');
-        script.textContent = '(' + callback.toString() + ')('
-            + JSON.stringify(site) + ');';
-        document.body.appendChild(script);
-    }, false);
-    document.body.appendChild(script);
-}
-
-addJQuery(main);
