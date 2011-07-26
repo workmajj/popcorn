@@ -17,7 +17,7 @@
 // @version 0.2
 // ==/UserScript==
 
-function main() {
+function main(site) {
     
     // A Base64-encoded GIF to show while waiting for Hunch recs to load.
     
@@ -57,18 +57,6 @@ function main() {
         IpnOSoLgxxvqgKLEcCC65KEAByKK8cSpA4DAiHQ/DkKhGKh4ZCtCyZGo6F6iYYPAqFgYy0\
         2xkSaLEMV34tELyRYNEsCQyHlvWkGCzsPgMCEAY7Cg04Uk48LAsDhRA8MVQPEF0GAgqYYw\
         SRlycNcWskCkApIyEAOwAAAAAAAAAAAA==';
-    
-    // Describes where to find data on the Movie Showtimes pages.
-    
-    var site = {
-        "urls": ["http://google.com/movies", "http://www.google.com/movies"],
-        "path": "div.movie",
-        "id_path": ["span.info", "a.fl"],
-        "id_prefix": "imdb_",
-        "link_match": "IMDb",
-        "link_regex": "http:\\/\\/www.imdb.com\\/title\\/(tt\\d+)\\/",
-        "rec_path": ["div.name"]
-    };
     
     // Given an array, build up a jQuery object for some selector path.
     
@@ -185,6 +173,18 @@ function main() {
     
 }
 
+// Describes where to find data on the Movie Showtimes pages.
+
+var site = {
+    "urls": ["http://google.com/movies", "http://www.google.com/movies"],
+    "path": "div.movie",
+    "id_path": ["span.info", "a.fl"],
+    "id_prefix": "imdb_",
+    "link_match": "IMDb",
+    "link_regex": "http:\\/\\/www.imdb.com\\/title\\/(tt\\d+)\\/",
+    "rec_path": ["div.name"]
+};
+
 // Chrome doesn't support the @require header yet, so add jQuery manually:
 // http://erikvold.com/blog/index.cfm/2010/6/14/using-jquery-with-a-user-script
 
@@ -194,7 +194,8 @@ function addJQuery(callback) {
         'http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js');
     script.addEventListener('load', function() {
         var script = document.createElement('script');
-        script.textContent = '(' + callback.toString() + ')();';
+        script.textContent = '(' + callback.toString() + ')('
+            + JSON.stringify(site) + ');';
         document.body.appendChild(script);
     }, false);
     document.body.appendChild(script);
