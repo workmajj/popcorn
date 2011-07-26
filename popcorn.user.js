@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name Popcorn
 // @namespace https://github.com/workmajj/popcorn
-// @description Adds Hunch recommendations to product pages.
+// @description Adds Hunch recs to Google's Movie Showtimes pages.
 // @version 0.2
 // ==/UserScript==
 
