@@ -5,7 +5,7 @@
 // @version 0.2
 // ==/UserScript==
 
-// Describes where to find data on a particular site's product pages.
+// Describes where to find data the Movie Showtimes pages.
 
 var site = {
     "urls": ["http://google.com/movies", "http://www.google.com/movies"],
@@ -132,6 +132,8 @@ function main(site) {
     // Hunch, Freebase, etc.) Hunch uses internally. These vary depending on
     // the item's source and how long it's been on Hunch. Using these IDs, then
     // query to get customized recommendations. Choice of IDs affects results.
+    
+    // http://hunch.com/developers/v1/resources/console/
     
     window.hnAsyncInit = function() {
         for (id in itemIds) {
