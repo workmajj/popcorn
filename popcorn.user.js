@@ -5,7 +5,7 @@
 // @version 0.2
 // ==/UserScript==
 
-// Describes where to find data the Movie Showtimes pages.
+// Describes where to find data on a given page.
 
 var site = {
     "urls": ["http://google.com/movies", "http://www.google.com/movies"],
@@ -17,36 +17,32 @@ var site = {
     "rec_path": ["div.name"]
 };
 
-launch(main, site);
+// Check if the script applies to a given page based on the URL.
+
+var applyScript = false;
+var i = 0;
+while (applyScript === false) {
+    if (i >= site.urls.length) { break; }
+    if (location.href.indexOf(site.urls[i]) === 0) { applyScript = true; }
+    i++;
+}
+
+if (applyScript) { launch(main, site); }
 
 // Chrome doesn't support the @require header, so add jQuery manually:
 // http://erikvold.com/blog/index.cfm/2010/6/14/using-jquery-with-a-user-script
 
 function launch(callback, data) {
-    
-    // Check if the script applies to a given page based on the URL.
-    
-    var applyScript = false;
-    var i = 0;
-    while (applyScript === false) {
-        if (i >= site.urls.length) { break; }
-        if (location.href.indexOf(site.urls[i]) === 0) { applyScript = true; }
-        i++;
-    }
-    
-    if (applyScript) {
+    var script = document.createElement('script');
+    script.setAttribute('src',
+        'http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js');
+    script.addEventListener('load', function() {
         var script = document.createElement('script');
-        script.setAttribute('src',
-            'http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js');
-        script.addEventListener('load', function() {
-            var script = document.createElement('script');
-            script.textContent = '(' + callback.toString() + ')('
-                + JSON.stringify(data) + ');';
-            document.body.appendChild(script);
-        }, false);
+        script.textContent = '(' + callback.toString() + ')('
+            + JSON.stringify(data) + ');';
         document.body.appendChild(script);
-    }
-    
+    }, false);
+    document.body.appendChild(script);
 }
 
 function main(site) {
